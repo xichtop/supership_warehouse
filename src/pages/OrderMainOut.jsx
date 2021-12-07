@@ -41,6 +41,8 @@ const DeliveryTable = () => {
     const selectOptions = {
         ['Da roi kho']: 'Đã xuất kho',
         ['Da giao hang']: 'Đã giao hàng',
+        ['Dang tra hang']: 'Đang trả hàng',
+        ['Da tra hang']: 'Đã trả hàng',
     };
 
     const columns = [
@@ -48,12 +50,12 @@ const DeliveryTable = () => {
             dataField: 'DeliveryId',
             text: 'Mã vận đơn',
             sort: true,
-            filter: textFilter({ placeholder: 'Mã vận đơn...', }),
+            filter: textFilter({ placeholder: 'Mã...', }),
             style: {
                 fontWeight: 'bold',
             },
             headerStyle: {
-                width: '120px',
+                width: '80px',
             }
         },
         {
@@ -62,7 +64,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'Mã cửa hàng...', }),
             headerStyle: {
-                width: '120px',
+                width: '90px',
             }
         },
         {
@@ -219,8 +221,8 @@ const DeliveryTable = () => {
     return (
         <div >
             <div className="row">
-                <div className="col-sm-12 btn btn-info">
-                    Danh Sách Vận Đơn
+                <div className="col-sm-12 title">
+                    Danh Sách Xuất Kho
                 </div>
             </div>
             <ToolkitProvider

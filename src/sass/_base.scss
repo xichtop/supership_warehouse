@@ -73,9 +73,10 @@ img {
 
 .container {
     width: 100%;
-    max-width: 1620px;
-    padding: 0 50px;
-    margin: auto;
+    max-width: 1420px;
+    // padding: 0 50px;
+    // margin: auto;
+    // margin-left: 80px;
 
     @include tablet {
         padding: 0 20px;
@@ -88,6 +89,7 @@ img {
 
 .main {
     margin-top: $header-height;
+    margin-left: 120px;
     margin-bottom: 2rem;
     min-height: 100vh;
 
@@ -102,4 +104,12 @@ img {
 
 .grid {
     display: grid;
+}
+
+.title {
+    font-size: 30px;
+    @include flex(center, center);
+    padding: 10px 0;
+    font-weight: bold;
+    color: #112D4E;
 }

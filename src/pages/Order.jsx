@@ -73,7 +73,7 @@ const EditButton = (props) => {
                     ...configNotify
                 });
                 handleCheck();
-                history.push('/orderin');
+                history.push('/');
             }
         }
         confirmAlert({
@@ -126,7 +126,7 @@ const EditButton = (props) => {
                     ...configNotify
                 });
                 handleCheck();
-                history.push('/orderout');
+                history.push('/');
             }
         }
         confirmAlert({
@@ -140,7 +140,7 @@ const EditButton = (props) => {
                 {
                     label: 'Không',
                     onClick: () => {
-                        history.push('/store');
+                        history.push('/');
                     }
                 }
             ],
@@ -209,12 +209,12 @@ const DeliveryTable = () => {
             dataField: 'DeliveryId',
             text: 'Mã vận đơn',
             sort: true,
-            filter: textFilter({ placeholder: 'Mã vận đơn...', }),
+            filter: textFilter({ placeholder: 'Mã...', }),
             style: {
                 fontWeight: 'bold',
             },
             headerStyle: {
-                width: '120px',
+                width: '60px',
             }
         },
         {
@@ -223,7 +223,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'Mã cửa hàng...', }),
             headerStyle: {
-                width: '120px',
+                width: '80px',
             }
         },
         {
@@ -232,7 +232,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'Tên người nhận...', }),
             headerStyle: {
-                width: '120px',
+                width: '106px',
             }
         },
         {
@@ -241,7 +241,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'SĐT người nhận...', }),
             headerStyle: {
-                width: '120px',
+                width: '100px',
             }
         },
         {
@@ -287,7 +287,7 @@ const DeliveryTable = () => {
             formatter: cell => numberWithCommas(cell),
             filter: numberFilter({ placeholder: 'Nhập tổng tiền ...', }),
             headerStyle: {
-                width: '120px',
+                width: '100px',
             }
         },
         {
@@ -388,8 +388,8 @@ const DeliveryTable = () => {
     return (
         <div >
             <div className="row">
-                <div className="col-sm-12 btn btn-info">
-                    Danh Sách Vận Đơn
+                <div className="col-sm-12 title">
+                    Danh Sách Vận Đơn Mới
                 </div>
             </div>
             <ToolkitProvider

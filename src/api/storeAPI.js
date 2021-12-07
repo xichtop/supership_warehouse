@@ -1,6 +1,8 @@
 import axiosClient from "./axiosClient";
 
 const storeAPI = {
+
+    // lấy danh sách cửa hàng
     getAll: (token) => {
         const url = '/stores/';
         return axiosClient.get(url, {headers: {

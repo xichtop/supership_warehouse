@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import deliveryAPI from '../api/deliveryAPI';
-import { Table, Card, CardTitle, CardBody } from 'reactstrap';
+import { Table, ButtonToggle, Card, CardTitle, CardBody } from 'reactstrap';
 import { useSelector } from 'react-redux';
 import numberWithCommas from '../utils/numberWithCommas';
+import { useHistory } from "react-router-dom";
+
+import { store } from 'react-notifications-component';
+import 'react-notifications-component/dist/theme.css';
+// confirm alert
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 // React bootstrap table
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
@@ -11,23 +18,165 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter, selectFilter, dateFilter, numberFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 
+const EditButton = (props) => {
+
+    const token = useSelector(state => state.staff.token);
+
+    const StaffId = useSelector(state => state.staff.staff.StaffId);
+
+    const history = useHistory();
+
+    const handleCheck = props.handleCheck;
+
+    const Status = props.row.StatusDetail;
+
+    const DeliveryId = props.row.DeliveryId;
+
+    const configNotify = {
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+            duration: 3000,
+            onScreen: true
+        }
+    }
+
+    const hanleIn = () => {
+        const item = {
+            DeliveryId: DeliveryId,
+            StaffId: StaffId,
+            Status: 'Nhap kho',
+        }
+        const fetchUpdateDelivery = async () => {
+            var result = {};
+            try {
+                result = await deliveryAPI.updateReturn(item, token);
+            } catch (error) {
+                console.log("Failed to fetch update delivery status: ", error);
+            }
+            if (result.successful == true) {
+                store.addNotification({
+                    title: "Wonderfull!",
+                    message: `Xác nhận nhập kho thành công!`,
+                    type: "success",
+                    ...configNotify
+                });
+                handleCheck();
+                history.push('/orderin');
+            } else {
+                store.addNotification({
+                    title: "Error!",
+                    message: `Xác nhận nhập kho thất bại, vui lòng thử lại sau!`,
+                    type: "warning",
+                    ...configNotify
+                });
+                handleCheck();
+                history.push('/return');
+            }
+        }
+        confirmAlert({
+            title: 'Xác nhận Nhập Kho',
+            message: 'Bạn có chắc chắc muốn xác nhận nhập kho đơn hàng này không?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: () => fetchUpdateDelivery()
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+                        history.push('/');
+                    }
+                }
+            ],
+            closeOnEscape: true,
+            closeOnClickOutside: true,
+        });
+    }
+
+    const hanleOut = () => {
+        const item = {
+            DeliveryId: DeliveryId,
+            StaffId: StaffId,
+            Status: 'Xuat kho',
+        }
+        const fetchUpdateDelivery = async () => {
+            var result = {};
+            try {
+                result = await deliveryAPI.updateReturn(item, token);
+            } catch (error) {
+                console.log("Failed to fetch update delivery status: ", error);
+            }
+            if (result.successful == true) {
+                store.addNotification({
+                    title: "Wonderfull!",
+                    message: `Xác nhận xuất kho thành công!`,
+                    type: "success",
+                    ...configNotify
+                });
+                handleCheck();
+                history.push('/orderout');
+            } else {
+                store.addNotification({
+                    title: "Error!",
+                    message: `Xác nhận xuất kho thất bại, vui lòng thử lại sau!`,
+                    type: "warning",
+                    ...configNotify
+                });
+                handleCheck();
+                history.push('/return');
+            }
+        }
+        confirmAlert({
+            title: 'Xác Nhận Xuất Kho',
+            message: 'Bạn có chắc chắc muốn xác nhận xuất kho này không?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: () => fetchUpdateDelivery()
+                },
+                {
+                    label: 'Không',
+                    onClick: () => {
+                        history.push('/return');
+                    }
+                }
+            ],
+            closeOnEscape: true,
+            closeOnClickOutside: true,
+        });
+        
+    }
+    return (
+        <div>
+            {Status.trim() === 'Dang ve kho' ?
+                <td>
+                    <ButtonToggle color="info" onClick={hanleIn}>Xác nhận nhập kho</ButtonToggle>{' '}
+                </td>
+                :
+                <td>
+                    <ButtonToggle color="danger" onClick={hanleOut}>Xác nhận xuất kho</ButtonToggle>{' '}
+                </td>
+            }
+            
+        </div>
+    );
+};
+
 const DeliveryTable = () => {
 
     const token = useSelector(state => state.staff.token);
 
-    const staffId = useSelector(state => state.staff.staff.StaffId);
-
     const [deliveries, setDeliveries] = useState([]);
 
+    const [check, setCheck] = useState(false);
+
     const fetchdeliveries = async () => {
-        const item = {
-            StaffId: staffId,
-            Status: 'Nhap kho'
-        }
         var deliveries = [];
         try {
-            deliveries = await deliveryAPI.getAllMain(item, token);
-            // console.log(stores);
+            deliveries = await deliveryAPI.getAllReturn(token);
         } catch (error) {
             console.log("Failed to fetch options: ", error);
         }
@@ -38,13 +187,21 @@ const DeliveryTable = () => {
         fetchdeliveries();
     }, []);
 
+    useEffect(() => {
+        fetchdeliveries();
+    }, [check]);
+
+    const handleCheck = () => {
+        setCheck(!check);
+    }
+
+    const cellButton = (cell, row, rowIndex) => (
+        <EditButton cell={cell} row={row} rowIndex={rowIndex} handleCheck={handleCheck} />
+    );
+
     const selectOptions = {
-        ['Da ve kho']: 'Đã nhập kho',
         ['Dang roi kho']: 'Đang xuất kho',
-        ['Da roi kho']: 'Đã xuất kho',
-        ['Da giao hang']: 'Đã giao hàng',
-        ['Dang tra hang']: 'Đang trả hàng',
-        ['Da tra hang']: 'Đã trả hàng',
+        ['Dang ve kho']: 'Đang nhập kho',
     };
 
     const columns = [
@@ -52,12 +209,12 @@ const DeliveryTable = () => {
             dataField: 'DeliveryId',
             text: 'Mã vận đơn',
             sort: true,
-            filter: textFilter({ placeholder: 'Mã vận đơn...', }),
+            filter: textFilter({ placeholder: 'Mã...', }),
             style: {
                 fontWeight: 'bold',
             },
             headerStyle: {
-                width: '80px',
+                width: '60px',
             }
         },
         {
@@ -66,7 +223,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'Mã cửa hàng...', }),
             headerStyle: {
-                width: '90px',
+                width: '80px',
             }
         },
         {
@@ -75,7 +232,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'Tên người nhận...', }),
             headerStyle: {
-                width: '120px',
+                width: '106px',
             }
         },
         {
@@ -84,7 +241,7 @@ const DeliveryTable = () => {
             sort: true,
             filter: textFilter({ placeholder: 'SĐT người nhận...', }),
             headerStyle: {
-                width: '120px',
+                width: '100px',
             }
         },
         {
@@ -130,7 +287,7 @@ const DeliveryTable = () => {
             formatter: cell => numberWithCommas(cell),
             filter: numberFilter({ placeholder: 'Nhập tổng tiền ...', }),
             headerStyle: {
-                width: '120px',
+                width: '100px',
             }
         },
         {
@@ -160,6 +317,14 @@ const DeliveryTable = () => {
                 options: selectOptions
             })
         },
+        {
+            text: "Thao Tác",
+            formatter: cellButton,
+            sort: true,
+            headerStyle: {
+                width: '90px',
+            },
+        }
     ];
 
     const PageOptions = {
@@ -224,7 +389,7 @@ const DeliveryTable = () => {
         <div >
             <div className="row">
                 <div className="col-sm-12 title">
-                    Danh Sách Nhập Kho
+                    Danh Sách Đơn Trả Hàng
                 </div>
             </div>
             <ToolkitProvider
