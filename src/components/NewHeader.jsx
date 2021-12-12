@@ -1,38 +1,31 @@
-import React, { useRef } from 'react'
-import { Link, useLocation, useHistory } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../slice/staffSlice';
-import logo from '../assets/ship-01.png';
-
-const mainNav = [
-    {
-        display: "Chờ Xác Nhận",
-        path: "/"
-    },
-    {
-        display: "Đã Xác Nhận Nhập",
-        path: "/orderin"
-    },
-    {
-        display: "Đã Xác Nhận Xuất",
-        path: "/orderout"
-    },
-]
 
 const NewHeader = () => {
 
-    // const history = useHistory();
-
     const dispatch = useDispatch();
 
+    const { pathname } = useLocation();
+
+    const [slogan, setSlogan] = useState('Đơn Hàng Mới')
+
+    useEffect(() => {
+        if (pathname === '/') {
+            setSlogan('Đơn Hàng Mới')
+        } else if (pathname === '/return') {
+            setSlogan('Đơn Trả Hàng')
+        } 
+        else if (pathname === '/orderin') {
+            setSlogan('Xác Nhận Nhập Kho')
+        } 
+        else if (pathname === '/orderout') {
+            setSlogan('Xác Nhận Xuất Kho')
+        } 
+    }, [pathname])
+
     const staff = useSelector(state => state.staff.staff);
-
-    const { pathname } = useLocation()
-    const activeNav = mainNav.findIndex(e => e.path === pathname)
-
-    const menuLeft = useRef(null)
-
-    const menuToggle = () => menuLeft.current.classList.toggle('active')
 
     const handleLogout = () => {
         const action = logout();
@@ -42,7 +35,7 @@ const NewHeader = () => {
     return (
         <div className="header" >
             <div className="header__slogan" >
-                    <span className="header__slogan__span">Giao hàng nhanh - Giành chiến thắng</span>
+                    <span className="header__slogan__span">{slogan}</span>
                 </div>
             <div className="header__menu">
                 <div className="header__menu__left" >
